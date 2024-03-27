@@ -13,4 +13,7 @@ router.get('/locations', controllers.location.getAll);
 router.get('/location/:slug', controllers.location.get);
 router.delete('/location/:slug', controllers.location.remove);
 
+//temperature routes
+router.get('/temperature', controllers.temperature.get)
+
 module.exports = router;

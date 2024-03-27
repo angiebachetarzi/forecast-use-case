@@ -4,11 +4,14 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "node src/index.js",
-        "start-dev": "nodemon src/index.js"
+        "start": "node src/index.js ",
+        "start-dev": "nodemon src/index.js",
+        "start-cron-job": "node src/jobs/updateTemperatures.jobs.js"
     },
     "license": "ISC",
     "dependencies": {
+        "agenda": "^5.0.0",
+        "axios": "^1.6.8",
         "body-parser": "^1.20.2",
         "cors": "^2.8.5",
         "dotenv": "^8.1.0",

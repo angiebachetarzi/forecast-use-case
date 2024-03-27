@@ -1,4 +1,5 @@
-const locationService = require('../../services/location/');
+const models = require('../../models');
+const service = require('../../services');
 const { successResponse, errorResponse, logger } = require('../../utils/');
 
 /**
@@ -8,7 +9,7 @@ const { successResponse, errorResponse, logger } = require('../../utils/');
  */
 const getAll = async (_, res) => {
     try {
-        const locations = await locationService.findAll();
+        const locations = await service.findAll(models.location);
         
         successResponse(res, 200, { locations });
         

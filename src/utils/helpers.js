@@ -14,8 +14,16 @@ const isValidLongitude = (longitude) => {
 const isValidLatitude = (latitude) => {
     return typeof latitude === 'number' && latitude >= -90 && latitude <= 90;
 }
+
+const isValidDateFormat = (dateString) => {
+    //regular expression to match 'YYYY-MM-DD' format
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    return regex.test(dateString);
+}
+
 module.exports = {
     isURLSafe,
     isValidLongitude,
-    isValidLatitude
+    isValidLatitude,
+    isValidDateFormat
 }

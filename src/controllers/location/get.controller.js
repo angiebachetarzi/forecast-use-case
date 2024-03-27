@@ -1,4 +1,5 @@
-const locationService = require('../../services/location/');
+const models = require('../../models/');
+const service = require('../../services');
 const { successResponse, errorResponse, logger } = require('../../utils/');
 
 /**
@@ -15,7 +16,7 @@ const getAll = async ({params}, res) => {
             return;
         }
 
-        const location = await locationService.findOne({ slug: params.slug });
+        const location = await service.findOne(models.location, { slug: params.slug });
         if (!location) {
             errorResponse(res, 404, `Location ${params.slug} not found.`);
             return;
@@ -25,7 +26,7 @@ const getAll = async ({params}, res) => {
         
     } catch (error) {
         logger.error('controllers/location/get.controller.js', error);
-        errorResponse(res, 500, 'Something went wrong while fetching location ${params.slug}.');
+        errorResponse(res, 500, `Something went wrong while fetching location ${params.slug}.`);
     }
 };
 

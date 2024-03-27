@@ -1,4 +1,5 @@
-const locationService = require('../../services/location/');
+const models = require('../../models');
+const service = require('../../services');
 const { isURLSafe, isValidLatitude, isValidLongitude } = require('../../utils/helpers');
 const { successResponse, errorResponse, logger } = require('../../utils/');
 
@@ -36,8 +37,8 @@ const create = async ({ body: location }, res) => {
             return;
         }
         
-        //persist hackaton in the database
-        const createdLocation = await locationService.create(location);
+        //persist location in the database
+        const createdLocation = await service.create(models.location, location);
         
         //respond with error in case persisting failed
         if (!createdLocation) {
@@ -45,7 +46,7 @@ const create = async ({ body: location }, res) => {
             return;
         }
         
-        //respond with the location ID
+        //respond with the location slug
         successResponse(res, 200, { slug: createdLocation.slug });
         
     } catch (error) {

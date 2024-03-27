@@ -1,4 +1,5 @@
-const locationService = require('../../services/location/');
+const models = require('../../models');
+const service = require('../../services');
 const { isValidLatitude, isValidLongitude } = require('../../utils/helpers');
 const { successResponse, errorResponse, logger } = require('../../utils/');
 
@@ -25,10 +26,20 @@ const update = async ({ body: location, params }, res) => {
         }
 
         //find corresponding location
-        const location2Update = await locationService.findOne({ slug: params.slug });
+        const location2Update = await service.findOne(models.location, { slug: params.slug });
         if (!location2Update) {
             errorResponse(res, 404, `Location ${params.slug} not found.`);
             return;
+        }
+
+        //delete temperatures linked to the old location
+        const tempArray = await service.findAll(models.temperature, {location: location2Update})
+        for (const temp of tempArray) {
+            const deletedTemp = await service.remove(models.temperature, '_id', temp._id)
+            if (!deletedTemp) {
+                errorResponse(res, 500, 'Failed to delete temperature.');
+                return;
+            }
         }
 
         //check if latitude and longitude are valid if present
@@ -41,8 +52,8 @@ const update = async ({ body: location, params }, res) => {
             return;
         }
         
-        //persist hackaton in the database
-        const updatedLocation = await locationService.update({ slug: params.slug }, location);
+        //persist location in the database
+        const updatedLocation = await service.update(models.location, { slug: params.slug }, location);
         
         //respond with error in case persisting failed
         if (!updatedLocation) {

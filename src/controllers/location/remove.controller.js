@@ -1,4 +1,5 @@
-const locationService = require('../../services/location/');
+const models = require('../../models');
+const service = require('../../services');
 const { successResponse, errorResponse, logger } = require('../../utils/');
 
 /**
@@ -16,15 +17,25 @@ const remove = async ({ params }, res) => {
         }
 
         //find corresponding location
-        const location2Delete = await locationService.findOne({ slug: params.slug });
+        const location2Delete = await service.findOne(models.location, { slug: params.slug });
         if (!location2Delete) {
             errorResponse(res, 404, `Location ${params.slug} not found.`);
             return;
         }
 
-        const deletedLocation = await locationService.remove(params.slug);
+        //delete temperatures linked to the location
+        const tempArray = await service.findAll(models.temperature, {location: location2Delete})
+        for (const temp of tempArray) {
+            const deletedTemp = await service.remove(models.temperature, '_id', temp._id)
+            if (!deletedTemp) {
+                errorResponse(res, 500, 'Failed to delete temperature.');
+                return;
+            }
+        }
+
+        const deletedLocation = await service.remove(models.location, 'slug', params.slug);
         
-        //respond with error if the hackaton could not be deleted
+        //respond with error if the location could not be deleted
         if (!deletedLocation) {
             errorResponse(res, 500, 'Failed to delete location.');
             return;
