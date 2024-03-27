@@ -46,7 +46,7 @@ const create = async ({ body: location }, res) => {
         }
         
         //respond with the location ID
-        successResponse(res, 200, { locationID: createdLocation.id });
+        successResponse(res, 200, { slug: createdLocation.slug });
         
     } catch (error) {
         //case of duplicate slug attempt
