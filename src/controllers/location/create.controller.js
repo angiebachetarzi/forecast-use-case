@@ -6,7 +6,7 @@ const { successResponse, errorResponse, logger } = require('../../utils/');
  * creates new location
  * @param location {object} location object that was sent
  * @param res {object} response object
- * @returns {Promise<void>}
+ * @returns new location id if success
  */
 const create = async ({ body: location }, res) => {
     try {

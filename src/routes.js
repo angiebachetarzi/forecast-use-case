@@ -9,5 +9,7 @@ const router = express.Router();
 //location routes
 router.post('/location', controllers.location.create);
 router.put('/location/:slug', controllers.location.update);
+router.get('/locations', controllers.location.getAll);
+router.get('/location/:slug', controllers.location.get);
 
 module.exports = router;

@@ -7,14 +7,14 @@ const { successResponse, errorResponse, logger } = require('../../utils/');
  * only longitude and latitude can be updated
  * @param location {object} location object with updated fields
  * @param res {object} response object
- * @returns {Promise<void>}
+ * @returns success message if update ok
  */
-const create = async ({ body: location, params }, res) => {
+const update = async ({ body: location, params }, res) => {
     try {
 
         //check correct param
         if (!params.slug) {
-            errorResponse(res, 400, 'Slug location missing.');
+            errorResponse(res, 404, 'Slug location missing in param.');
             return;
         }
 
@@ -50,13 +50,12 @@ const create = async ({ body: location, params }, res) => {
             return;
         }
         
-        //respond with the location ID
         successResponse(res, 200, 'Successfully updated location with slug ' + params.slug);
         
     } catch (error) {
-        logger.error('controllers/location/create.js', error);
+        logger.error('controllers/location/update.js', error);
         errorResponse(res, 500, 'Something went wrong while creating the location.');
     }
 };
 
-module.exports = create;
+module.exports = update;
