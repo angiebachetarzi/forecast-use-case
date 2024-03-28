@@ -236,7 +236,7 @@ Deletes a location by slug
 
 ***Deleting a location leads to the removal of the corresponding temeratures' list***
 
-### Temerature
+### Temperature
 
 ``GET /temerature?slug=<slug>&startDate=<start_date>&endDate=<end_date>``
 
