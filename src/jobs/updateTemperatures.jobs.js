@@ -5,9 +5,9 @@ const configs = require('../configs');
 const models = require('../models')
 const service = require('../services');
 
-//for testing only this script without the api, uncomment
-//const mongoose = require('mongoose');
-//mongoose.connect(configs.mongoDB.uri, { useNewUrlParser: true, useUnifiedTopology: true });
+//connect to db
+const mongoose = require('mongoose');
+mongoose.connect(configs.mongoDB.uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const agenda = new Agenda({ db: { address: configs.mongoDB.uri } });
 
@@ -79,6 +79,7 @@ agenda.define('update temperatures', async (job) => {
     } catch (error) {
         console.error('Error updating temperatures:', error);
     }
+    console.log('Script terminated.')
 });
 
 //start agenda and schedule the job to run every 5mn

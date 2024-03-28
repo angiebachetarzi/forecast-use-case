@@ -61,7 +61,7 @@ const update = async ({ body: location, params }, res) => {
             return;
         }
         
-        successResponse(res, 200, 'Successfully updated location with slug ' + params.slug);
+        successResponse(res, 200, `Successfully updated location with slug ${params.slug}`);
         
     } catch (error) {
         logger.error('controllers/location/update.js', error);

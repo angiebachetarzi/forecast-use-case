@@ -1,0 +1,502 @@
+{
+	"info": {
+		"_postman_id": "834dfe0b-fba1-42d5-b60e-a967025546fb",
+		"name": "Forecast",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11426229"
+	},
+	"item": [
+		{
+			"name": "Location",
+			"item": [
+				{
+					"name": "Create location (Fail)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is not ok\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"error message is correct\", function () {",
+									"    var jsonData = pm.response.json()",
+									"    pm.expect(jsonData.message).to.equal('Invalid longtitude for location: Value must be between -180 and 180.');",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"slug\": \"locationTest\",\n    \"longitude\": 500.11,\n    \"latitude\": 25.2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/location",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"location"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create location (Success)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.collectionVariables.set('locationSlug', pm.response.json().payload.slug)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"slug\": \"locationTest\",\n    \"longitude\": 102.11,\n    \"latitude\": 25.2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/location",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"location"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update location (Fail)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is not ok\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"error message is correct\", function () {",
+									"    var jsonData = pm.response.json()",
+									"    pm.expect(jsonData.message).to.equal('Updating slug location is not allowed. Please remove slug from body.');",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"slug\": \"location1\",\n    \"longitude\": 10.20\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/location/{{locationSlug}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"location",
+								"{{locationSlug}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update location (Sucess)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"longitude\": 10.20\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/location/{{locationSlug}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"location",
+								"{{locationSlug}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch location",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"response contains correct location\", function() {",
+									"    var jsonData = pm.response.json().payload",
+									"    pm.expect(jsonData.location).to.not.eq(null);",
+									"    var loc = jsonData.location",
+									"    pm.expect(loc).to.have.property('_id')",
+									"    pm.expect(loc._id).to.not.eq(null)",
+									"    pm.expect(loc).to.have.property('slug')",
+									"    pm.expect(loc.slug).to.eq(pm.collectionVariables.get('locationSlug'))",
+									"    pm.expect(loc).to.have.property('longitude')",
+									"    pm.expect(loc.longitude).to.eq(10.2)",
+									"    pm.expect(loc).to.have.property('latitude')",
+									"    pm.expect(loc.latitude).to.eq(25.2)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/location/{{locationSlug}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"location",
+								"{{locationSlug}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch locations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response contains array of locations', function() {",
+									"    var jsonData = pm.response.json().payload",
+									"    pm.expect(jsonData.locations.length).to.be.gt(0)",
+									"})",
+									"",
+									"pm.test(\"response contains correct location\", function() {",
+									"    var loc = pm.response.json().payload.locations[0]",
+									"    pm.expect(loc).to.have.property('_id')",
+									"    pm.expect(loc._id).to.not.eq(null)",
+									"    pm.expect(loc).to.have.property('slug')",
+									"    pm.expect(loc).to.have.property('longitude')",
+									"    pm.expect(loc).to.have.property('latitude')",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/locations",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete location",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.collectionVariables.unset('locationSlug')"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/location/{{locationSlug}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"location",
+								"{{locationSlug}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Temperature",
+			"item": [
+				{
+					"name": "Create location (Success)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.collectionVariables.set('locationSlug', pm.response.json().payload.slug)"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"slug\": \"locationTest\",\n    \"longitude\": 102.11,\n    \"latitude\": 25.2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/location",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"location"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forecast",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('response contains array of forecasts', function() {",
+									"    var jsonData = pm.response.json().payload",
+									"    pm.expect(jsonData.forecast.length).to.be.gte(0)",
+									"})",
+									"",
+									"pm.test(\"check on one forecast\", function() {",
+									"    var forecast = pm.response.json().payload.forecast",
+									"    if (forecast.length > 0) {",
+									"        var elt = forecast[0]",
+									"        pm.expect(elt).to.have.property('date')",
+									"        pm.expect(elt.date).to.not.eq(null)",
+									"        pm.expect(elt).to.have.property('min-forecasted')",
+									"        pm.expect(elt['min-forecasted']).to.not.eq(null)",
+									"        pm.expect(elt).to.have.property('max-forecasted')",
+									"        pm.expect(elt['max-forecasted']).to.not.eq(null)",
+									"    }",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/temperature?slug=location1&startDate=2024-03-02&endDate=2024-03-29",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"temperature"
+							],
+							"query": [
+								{
+									"key": "slug",
+									"value": "location1"
+								},
+								{
+									"key": "startDate",
+									"value": "2024-03-02"
+								},
+								{
+									"key": "endDate",
+									"value": "2024-03-29"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete location",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"response is ok\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.collectionVariables.unset('locationSlug')"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/location/{{locationSlug}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"location",
+								"{{locationSlug}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

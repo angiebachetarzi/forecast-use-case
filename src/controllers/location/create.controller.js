@@ -53,9 +53,10 @@ const create = async ({ body: location }, res) => {
         //case of duplicate slug attempt
         if (error.keyPattern && error.keyPattern.slug) {
             errorResponse(res, 400, 'Slug already exists for other location.');
+        } else {
+            logger.error('controllers/location/create.js', error);
+            errorResponse(res, 500, 'Something went wrong while creating the location.');
         }
-        logger.error('controllers/location/create.js', error);
-        errorResponse(res, 500, 'Something went wrong while creating the location.');
     }
 };
 

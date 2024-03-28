@@ -42,22 +42,30 @@ const getAll = async (req, res) => {
             return;
         }
 
-        //get temperatures from start date to end date
+        //get temperatures array from start date to end date
         const tempArray = await service.findAll(models.temperature, {
             location: location, day: {
                 $gte: req.query.startDate,
                 $lte: req.query.endDate
         }})
 
-        console.log(tempArray)
+        //create forecast
         let forecast = []
         tempArray.forEach(temp => {
             forecast.push({
+                //transforms date from yyyy-mm-ddThh:mm:ss to yyyy-mm-dd
                 'date': temp.day.toISOString().split('T')[0],
-                'min-forecasted': Math.min(...temp.temperatures),
-                'max-forecasted': Math.max(...temp.temperatures)
+                'min-forecasted': Math.min(...temp.temperatures), //get min temp
+                'max-forecasted': Math.max(...temp.temperatures) //get max temp
             })
         })
+
+        //sort the forecats by dates in ascending order
+        forecast.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return dateA - dateB;
+        });
         
         successResponse(res, 200, { forecast });
         
