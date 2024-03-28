@@ -286,9 +286,9 @@ A test plan has been writen in [Postman](https://www.postman.com/). The file *te
 
 ### Sharding
 
-The data from the *Temperatures* collection will surely escalate rapidely, so a sharding startegy ought to be established.
+The data from the *Temperatures* collection will surely escalate rapidely, so a sharding startegy should be established.
 
-The shard could be the *day* field of the collection, as it is used frequently in queries and increases monotonically.
+A mix of zoned sharding and ranged sharding could be considered.
 
 ### Cron job
 
