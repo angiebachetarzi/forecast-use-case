@@ -53,12 +53,12 @@ agenda.define('update temperatures', async (job) => {
 
                 const tempTodayDoc = await service.create(models.temperature, {
                     location: location,
-                    day: nextDay,
+                    day: today,
                     temperatures: tempCurrent
                 });
                 const tempNextDayDoc = await service.create(models.temperature, {
                     location: location,
-                    day: today,
+                    day: nextDay,
                     temperatures: tempNextDay
                 });
                 const tempNextNextDoc = await service.create(models.temperature, {
