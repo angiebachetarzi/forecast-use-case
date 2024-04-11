@@ -144,14 +144,19 @@ Creates new location
 
 Updates existing location by slug
 
+Longitude and latitude are optional
+
 *Example request*
 
 ```
 {
+    "slug": <updated_slug>
     "longitude": <updated_longitude>,
     "latitude": <updated_latitude>
 }
 ```
+
+***slug must be in request body***
 
 *Example response*
 
@@ -163,7 +168,7 @@ Updates existing location by slug
 }
 ```
 
-***Updating a location leads to the removal of the corresponding temeratures' list***
+***Updating a location DOES NOT REMOVE the corresponding temperatures' list***
 
 ``GET /location/:slug``
 
@@ -234,13 +239,14 @@ Deletes a location by slug
 }
 ```
 
-***Deleting a location leads to the removal of the corresponding temeratures' list***
+***Deleting a location DOES NOT REMOVE the corresponding temperatures' list***
 
 ### Temperature
 
 ``GET /temerature?slug=<slug>&startDate=<start_date>&endDate=<end_date>``
 
-returns forecast for a given location between start date and end date
+returns forecast for a given location between start date and end date (if data not available for that time period, returns empty array, if partial data available, returns it)
+
 
 *Example response*
 
@@ -251,12 +257,12 @@ returns forecast for a given location between start date and end date
     "payload": {
         "forecast": [
             {
-                "date": "2024-03-28",
+                "date": "2024-03-27",
                 "min-forecasted": 9,
                 "max-forecasted": 24
             },
             {
-                "date": "2024-03-27",
+                "date": "2024-03-28",
                 "min-forecasted": 7,
                 "max-forecasted": 24
             },
@@ -281,20 +287,4 @@ A test plan has been writen in [Postman](https://www.postman.com/). The file *te
 ## Run collection
 
 ![Run Postman!](/assets/run_collection.png "Run Postman")
-
-## Future steps
-
-### Sharding
-
-The data from the *Temperatures* collection will surely escalate rapidely, so a sharding startegy should be established.
-
-A mix of zoned sharding and ranged sharding could be considered.
-
-### Cron job
-
-For now, the cron job for fetching the temperatures from the external API is run periodically (every 5 minutes, the choice is arbitrary).
-
-It could be run instead every 3 days, as each request gets data for the span of 3 days already. In addition to that, the script could be triggered upon the creation of a new location.
-
-The aim is to decrease the number of API calls to *7timer*.
 

@@ -23,8 +23,13 @@ const update = async ({ body: location, params }, res) => {
         //if body contains lon and/or lat, but no slug, generate error
         //changing lon and/or lat while keeping same slug will create a discrepancy in temperatures related to slug
         //temps are linked to lon and lat, so changing them makes temps obsolete
-        if ((location.longitude || location.latitude) && !location.slug) {
-            errorResponse(res, 400, 'Updating lon and/or lat is not allowed without changing slug.');
+        if (!location.slug) {
+            errorResponse(res, 400, 'Updating location is not allowed without changing slug.');
+            return;
+        }
+
+        if (location.slug == params.slug) {
+            errorResponse(res, 400, 'Updating location slug implies a new slug.');
             return;
         }
 

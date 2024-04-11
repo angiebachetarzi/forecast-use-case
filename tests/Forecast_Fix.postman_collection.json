@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "834dfe0b-fba1-42d5-b60e-a967025546fb",
-		"name": "Forecast",
+		"_postman_id": "01b69ac5-2f30-4e6c-ace8-ecd6a10c60f2",
+		"name": "Forecast Fix",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "11426229"
 	},
@@ -108,15 +108,14 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"response is not ok\", function () {",
+									"pm.test(\"response is ok\", function () {",
 									"    pm.response.to.have.status(400);",
 									"});",
 									"",
 									"pm.test(\"error message is correct\", function () {",
 									"    var jsonData = pm.response.json()",
-									"    pm.expect(jsonData.message).to.equal('Updating slug location is not allowed. Please remove slug from body.');",
-									"});",
-									""
+									"    pm.expect(jsonData.message).to.equal('Updating lon and/or lat is not allowed without changing slug.');",
+									"});"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -128,7 +127,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"slug\": \"location1\",\n    \"longitude\": 10.20\n}",
+							"raw": "{\n    \"longitude\": 10.20\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -151,15 +150,23 @@
 					"response": []
 				},
 				{
-					"name": "Update location (Sucess)",
+					"name": "Update location (Success)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"response is ok\", function () {",
+									"pm.test(\"response is not ok\", function () {",
 									"    pm.response.to.have.status(200);",
-									"});"
+									"});",
+									"",
+									"pm.test(\"success message is correct\", function () {",
+									"    var jsonData = pm.response.json()",
+									"    pm.expect(jsonData.payload).to.equal('Successfully updated location with slug ' + pm.collectionVariables.get('locationSlug'));",
+									"});",
+									"",
+									"pm.collectionVariables.set('locationSlugUpdated', JSON.parse(pm.request.body.raw).slug)",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -171,7 +178,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"longitude\": 10.20\n}",
+							"raw": "{\n    \"slug\": \"location1\",\n    \"longitude\": 10.20\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -211,7 +218,7 @@
 									"    pm.expect(loc).to.have.property('_id')",
 									"    pm.expect(loc._id).to.not.eq(null)",
 									"    pm.expect(loc).to.have.property('slug')",
-									"    pm.expect(loc.slug).to.eq(pm.collectionVariables.get('locationSlug'))",
+									"    pm.expect(loc.slug).to.eq(pm.collectionVariables.get('locationSlugUpdated'))",
 									"    pm.expect(loc).to.have.property('longitude')",
 									"    pm.expect(loc.longitude).to.eq(10.2)",
 									"    pm.expect(loc).to.have.property('latitude')",
@@ -227,7 +234,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/location/{{locationSlug}}",
+							"raw": "http://localhost:3000/location/{{locationSlugUpdated}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -235,7 +242,7 @@
 							"port": "3000",
 							"path": [
 								"location",
-								"{{locationSlug}}"
+								"{{locationSlugUpdated}}"
 							]
 						}
 					},
@@ -310,7 +317,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/location/{{locationSlug}}",
+							"raw": "http://localhost:3000/location/{{locationSlugUpdated}}",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -318,7 +325,7 @@
 							"port": "3000",
 							"path": [
 								"location",
-								"{{locationSlug}}"
+								"{{locationSlugUpdated}}"
 							]
 						}
 					},
@@ -411,7 +418,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/temperature?slug=location1&startDate=2024-03-02&endDate=2024-03-29",
+							"raw": "http://localhost:3000/temperature?slug=locationTest&startDate=2024-04-02&endDate=2024-04-29",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -423,15 +430,15 @@
 							"query": [
 								{
 									"key": "slug",
-									"value": "location1"
+									"value": "locationTest"
 								},
 								{
 									"key": "startDate",
-									"value": "2024-03-02"
+									"value": "2024-04-02"
 								},
 								{
 									"key": "endDate",
-									"value": "2024-03-29"
+									"value": "2024-04-29"
 								}
 							]
 						}
@@ -475,6 +482,54 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "7timer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://www.7timer.info/bin/astro.php?lon=10.6&lat=15&ac=0&unit=metric&tzshift=0",
+					"protocol": "https",
+					"host": [
+						"www",
+						"7timer",
+						"info"
+					],
+					"path": [
+						"bin",
+						"astro.php"
+					],
+					"query": [
+						{
+							"key": "lon",
+							"value": "10.6"
+						},
+						{
+							"key": "lat",
+							"value": "15"
+						},
+						{
+							"key": "ac",
+							"value": "0"
+						},
+						{
+							"key": "unit",
+							"value": "metric"
+						},
+						{
+							"key": "tzshift",
+							"value": "0"
+						},
+						{
+							"key": "output",
+							"value": "json",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
@@ -497,6 +552,16 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "locationSlugUpdated",
+			"value": ""
+		},
+		{
+			"key": "locationSlug",
+			"value": ""
 		}
 	]
 }
