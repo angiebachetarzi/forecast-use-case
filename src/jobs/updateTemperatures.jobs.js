@@ -18,7 +18,7 @@ agenda
 /**
  * create the temperatures of each location for the span of 3 days
  */
-agenda.define('update temperatures', async (job) => {
+agenda.define('Update temperatures daily', async () => {
     console.log('Running script...')
     try {
         //get all locations
@@ -82,10 +82,12 @@ agenda.define('update temperatures', async (job) => {
     console.log('Script terminated.')
 });
 
-//start agenda and schedule the job to run every 5mn
-//5mn is arbitrary, I'm assuming locations are created pretty often
-//with each new location, a set of temperatur documents need to be created
+//start agenda and schedule the job to run every day at midnight (so that I always get 3 days)
+//with each new location, a set of temperature documents need to be created
 (async () => {
     await agenda.start();
-    await agenda.every('5 minutes', 'update temperatures');
+    //skipImmediate skips the first run, in case the app is launched before the cron is suposed to run
+    await agenda.every('0 0 * * *', 'Update temperatures daily').skipImmediate();
 })();
+
+module.exports = { agenda };

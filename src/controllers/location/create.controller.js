@@ -2,6 +2,7 @@ const models = require('../../models');
 const service = require('../../services');
 const { isURLSafe, isValidLatitude, isValidLongitude } = require('../../utils/helpers');
 const { successResponse, errorResponse, logger } = require('../../utils/');
+const { agenda } = require('../../jobs/updateTemperatures.jobs');
 
 /**
  * creates new location
@@ -48,6 +49,9 @@ const create = async ({ body: location }, res) => {
         
         //respond with the location slug
         successResponse(res, 200, { slug: createdLocation.slug });
+
+        //if the creation is a success, run the cron job to fetch the temperatures
+        agenda.now('Update temperatures daily');
         
     } catch (error) {
         //case of duplicate slug attempt
