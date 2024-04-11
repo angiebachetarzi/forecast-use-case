@@ -23,16 +23,6 @@ const remove = async ({ params }, res) => {
             return;
         }
 
-        //delete temperatures linked to the location
-        const tempArray = await service.findAll(models.temperature, {location: location2Delete})
-        for (const temp of tempArray) {
-            const deletedTemp = await service.remove(models.temperature, '_id', temp._id)
-            if (!deletedTemp) {
-                errorResponse(res, 500, 'Failed to delete temperature.');
-                return;
-            }
-        }
-
         const deletedLocation = await service.remove(models.location, 'slug', params.slug);
         
         //respond with error if the location could not be deleted

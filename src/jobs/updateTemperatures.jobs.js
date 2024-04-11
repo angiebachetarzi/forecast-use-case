@@ -18,7 +18,7 @@ agenda
 /**
  * create the temperatures of each location for the span of 3 days
  */
-agenda.define('Update temperatures daily', async () => {
+agenda.define('Update temperatures daily', async (job) => {
     console.log('Running script...')
     try {
         //get all locations
@@ -30,7 +30,7 @@ agenda.define('Update temperatures daily', async () => {
             //doing this to only get dates, idc about the time
             today.setUTCHours(0, 0, 0, 0);
 
-            const temperature = await service.findOne(models.temperature, { location: location, day: today})
+            const temperature = await service.findOne(models.temperature, { location: location.slug, day: today})
             //if it doesnt exist, create temperatures for today and the two next days
             if (!temperature) {
                 //make axios call to 7timer API
@@ -52,17 +52,17 @@ agenda.define('Update temperatures daily', async () => {
                 nextNextDay.setUTCHours(0, 0, 0, 0);
 
                 const tempTodayDoc = await service.create(models.temperature, {
-                    location: location,
+                    location: location.slug,
                     day: today,
                     temperatures: tempCurrent
                 });
                 const tempNextDayDoc = await service.create(models.temperature, {
-                    location: location,
+                    location: location.slug,
                     day: nextDay,
                     temperatures: tempNextDay
                 });
                 const tempNextNextDoc = await service.create(models.temperature, {
-                    location: location,
+                    location: location.slug,
                     day: nextNextDay,
                     temperatures: tempNextNextDay
                 });
@@ -80,14 +80,18 @@ agenda.define('Update temperatures daily', async () => {
         console.error('Error updating temperatures:', error);
     }
     console.log('Script terminated.')
+
+    job.repeatEvery("0 0 * * *", {
+        //skipImmediate skips the first run, in case the app is launched before the cron is suposed to run
+        skipImmediate: true,
+      });
+    await job.save();
 });
 
 //start agenda and schedule the job to run every day at midnight (so that I always get 3 days)
 //with each new location, a set of temperature documents need to be created
 (async () => {
     await agenda.start();
-    //skipImmediate skips the first run, in case the app is launched before the cron is suposed to run
-    await agenda.every('0 0 * * *', 'Update temperatures daily').skipImmediate();
 })();
 
 module.exports = { agenda };

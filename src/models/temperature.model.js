@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const locationSchema = require('./location.model.js')
 
 const temperatureSchema = new Schema({
-    location: locationSchema,
+    location: String, //location slug (unique so can act as id)
     day: Date,
     temperatures: [Number]
 });

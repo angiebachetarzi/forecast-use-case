@@ -37,6 +37,13 @@ const create = async ({ body: location }, res) => {
             errorResponse(res, 400, 'Invalid latitude for location: Value must be between -90 and 90.');
             return;
         }
+
+        //check if location with slug already exists
+        const locationFound = await service.findOne(models.location, { slug: location.slug });
+        if (locationFound) {
+            errorResponse(res, 400, `Location ${location.slug} already exists.`);
+            return;
+        }
         
         //persist location in the database
         const createdLocation = await service.create(models.location, location);
@@ -54,13 +61,8 @@ const create = async ({ body: location }, res) => {
         agenda.now('Update temperatures daily');
         
     } catch (error) {
-        //case of duplicate slug attempt
-        if (error.keyPattern && error.keyPattern.slug) {
-            errorResponse(res, 400, 'Slug already exists for other location.');
-        } else {
-            logger.error('controllers/location/create.js', error);
-            errorResponse(res, 500, 'Something went wrong while creating the location.');
-        }
+        logger.error('controllers/location/create.js', error);
+        errorResponse(res, 500, 'Something went wrong while creating the location.');
     }
 };
 

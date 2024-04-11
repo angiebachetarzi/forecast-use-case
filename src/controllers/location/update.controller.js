@@ -2,6 +2,7 @@ const models = require('../../models');
 const service = require('../../services');
 const { isValidLatitude, isValidLongitude } = require('../../utils/helpers');
 const { successResponse, errorResponse, logger } = require('../../utils/');
+const { agenda } = require('../../jobs/updateTemperatures.jobs');
 
 /**
  * updates an existing location
@@ -19,9 +20,11 @@ const update = async ({ body: location, params }, res) => {
             return;
         }
 
-        //body must contain only longitude and/or latitude fields
-        if (location.slug) {
-            errorResponse(res, 400, 'Updating slug location is not allowed. Please remove slug from body.');
+        //if body contains lon and/or lat, but no slug, generate error
+        //changing lon and/or lat while keeping same slug will create a discrepancy in temperatures related to slug
+        //temps are linked to lon and lat, so changing them makes temps obsolete
+        if ((location.longitude || location.latitude) && !location.slug) {
+            errorResponse(res, 400, 'Updating lon and/or lat is not allowed without changing slug.');
             return;
         }
 
@@ -30,16 +33,6 @@ const update = async ({ body: location, params }, res) => {
         if (!location2Update) {
             errorResponse(res, 404, `Location ${params.slug} not found.`);
             return;
-        }
-
-        //delete temperatures linked to the old location
-        const tempArray = await service.findAll(models.temperature, {location: location2Update})
-        for (const temp of tempArray) {
-            const deletedTemp = await service.remove(models.temperature, '_id', temp._id)
-            if (!deletedTemp) {
-                errorResponse(res, 500, 'Failed to delete temperature.');
-                return;
-            }
         }
 
         //check if latitude and longitude are valid if present
@@ -60,6 +53,9 @@ const update = async ({ body: location, params }, res) => {
             errorResponse(res, 500, 'Failed to update location. Please check your input.');
             return;
         }
+
+        //if lat and/or lon changed, run cron job (considered as a creation)
+        agenda.now('Update temperatures daily');
         
         successResponse(res, 200, `Successfully updated location with slug ${params.slug}`);
         
