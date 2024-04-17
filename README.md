@@ -16,7 +16,7 @@ Install npm modules
 npm install
 ```
 
-Create env file
+Create env file for MongoDB Atlas credentials
 
 ```
 vi .env
@@ -84,7 +84,8 @@ npm run start-cron-job
 │       ├── logger.js
 │       └── successResponse.js
 └── tests
-    └── Forecast.postman_collection.json
+    ├── Forecast_Fix.postman_collection.json
+    ├── mock_data_locations.json
 ````
 
 ## API documentation
@@ -278,13 +279,20 @@ returns forecast for a given location between start date and end date (if data n
 
 ## Testing
 
-A test plan has been writen in [Postman](https://www.postman.com/). The file *tests/Forecast.postman_collection.json* needs to be imported to the Postman workspace before running the tests.
+A test plan has been writen in [Postman](https://www.postman.com/). The file *tests/Forecast_Fix.postman_collection.json* needs to be imported to the Postman workspace before running the tests.
 
 ### Import file to Postman
 
 ![Import Postman!](/assets/postman_import.png "Import Postman")
 
-## Run collection
+### Run collection
 
 ![Run Postman!](/assets/run_collection.png "Run Postman")
+
+### MongoDB mock data
+
+The file *tests/mock_data_locations.json* has been generated using [Mockaroo](https://www.mockaroo.com/)
+
+![Mockaroo fields!](/assets/mockaroo_fields.png "Mockaroo fields")
+
 

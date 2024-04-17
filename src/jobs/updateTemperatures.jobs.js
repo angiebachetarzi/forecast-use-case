@@ -21,9 +21,26 @@ agenda
 agenda.define('Update temperatures daily', async (job) => {
     console.log('Running script...')
     try {
-        //get all locations
-        const locations = await service.findAll(models.location);
+        //fetch all locations in batches
+        const batchSize = 1000; // Number of documents to fetch per batch
+        let locations = [];
+        let pageNumber = 1;
 
+        while (true) {
+            const skip = (pageNumber - 1) * batchSize;
+            const pipeline = [
+                { $skip: skip },
+                { $limit: batchSize }
+            ];
+
+            const batchLocations = await service.aggregate(models.location, pipeline);
+            if (batchLocations.length === 0) {
+                break;
+            }
+
+            locations = locations.concat(batchLocations);
+            pageNumber++;
+        }
         for (const location of locations) {
             //check that location and date are not already in db
             const today = new Date();

@@ -9,7 +9,26 @@ const { successResponse, errorResponse, logger } = require('../../utils/');
  */
 const getAll = async (_, res) => {
     try {
-        const locations = await service.findAll(models.location);
+        //fetch all locations in batches
+        const batchSize = 1000; // Number of documents to fetch per batch
+        let locations = [];
+        let pageNumber = 1;
+
+        while (true) {
+            const skip = (pageNumber - 1) * batchSize;
+            const pipeline = [
+                { $skip: skip },
+                { $limit: batchSize }
+            ];
+
+            const batchLocations = await service.aggregate(models.location, pipeline);
+            if (batchLocations.length === 0) {
+                break;
+            }
+
+            locations = locations.concat(batchLocations);
+            pageNumber++;
+        }
         
         successResponse(res, 200, { locations });
         
